@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Box, TextField, Button, Typography } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from '@mui/material';
 
-export default function RotationForm({ onAdd }) {
+export default function RotationEditDialog({ open, rotation, onClose, onSave }) {
   const [form, setForm] = useState({
     startDate: '',
     endDate: '',
@@ -11,7 +11,10 @@ export default function RotationForm({ onAdd }) {
       черговий_по_місту: ''
     }
   });
-  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (rotation) setForm(rotation);
+  }, [rotation]);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -22,29 +25,12 @@ export default function RotationForm({ onAdd }) {
     }
   };
 
-  const handleSubmit = async e => {
-    e.preventDefault();
-    try {
-      await onAdd(form);
-      setError('');
-      setForm({
-        startDate: '',
-        endDate: '',
-        roles: {
-          служащий: '',
-          черговий_по_храму: '',
-          черговий_по_місту: ''
-        }
-      });
-    } catch {
-      setError('Помилка додавання');
-    }
-  };
+  const handleSave = () => onSave(form);
 
   return (
-    <Box sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}>
-      <Typography variant="h6">Додати чергування</Typography>
-      <form onSubmit={handleSubmit}>
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Редагувати чергування</DialogTitle>
+      <DialogContent>
         <TextField
           label="Початок"
           name="startDate"
@@ -89,11 +75,11 @@ export default function RotationForm({ onAdd }) {
           value={form.roles.черговий_по_місту}
           onChange={handleChange}
         />
-        {error && <Typography color="error">{error}</Typography>}
-        <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
-          Додати
-        </Button>
-      </form>
-    </Box>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Скасувати</Button>
+        <Button variant="contained" onClick={handleSave}>Зберегти</Button>
+      </DialogActions>
+    </Dialog>
   );
 }

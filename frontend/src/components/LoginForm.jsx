@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography } from '@mui/material';
-import { login } from '../api/rotationApi';
 
 export default function LoginForm({ setToken }) {
   const [username, setUsername] = useState('');
@@ -10,8 +9,7 @@ export default function LoginForm({ setToken }) {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const res = await login(username, password);
-      setToken(res.data.token);
+      await setToken(username, password);
       setError('');
     } catch (err) {
       setError('Невірний логін або пароль');

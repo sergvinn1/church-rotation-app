@@ -1,7 +1,9 @@
 import React from 'react';
-import { Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
+import { Table, TableHead, TableRow, TableCell, TableBody, Paper, IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-export default function RotationTable({ rotations }) {
+export default function RotationTable({ rotations, isAdmin, onEdit, onDelete }) {
   return (
     <Paper sx={{ mt: 4 }}>
       <Table>
@@ -12,6 +14,7 @@ export default function RotationTable({ rotations }) {
             <TableCell>Служащий</TableCell>
             <TableCell>Черг. по храму</TableCell>
             <TableCell>Черг. по місту</TableCell>
+            {isAdmin && <TableCell>Дії</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -22,6 +25,16 @@ export default function RotationTable({ rotations }) {
               <TableCell>{r.roles.служащий}</TableCell>
               <TableCell>{r.roles.черговий_по_храму}</TableCell>
               <TableCell>{r.roles.черговий_по_місту}</TableCell>
+              {isAdmin && (
+                <TableCell>
+                  <IconButton color="primary" onClick={() => onEdit(r)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton color="error" onClick={() => onDelete(r._id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>
