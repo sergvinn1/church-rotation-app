@@ -1,46 +1,33 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const router = express.Router();
 const User = require('../models/User');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // Реєстрація
 router.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  try {
-    const candidate = await User.findOne({ username });
-    if (candidate) return res.status(400).json({ message: 'Користувач вже існує' });
-
-    const passwordHash = await bcrypt.hash(password, 10);
-    const user = new User({ username, passwordHash, role: 'admin' });
-    await user.save();
-
-    res.status(201).json({ message: 'Адмін створений' });
-  } catch (err) {
-    res.status(500).json({ message: 'Помилка реєстрації' });
-  }
+  const { username, email, password, role } = req.body;
+  const hash = await bcrypt.hash(password, 10);
+  const user = new User({ username, email, password: hash, role: role || 'user' });
+  await user.save();
+  res.status(201).json({ message: 'User registered' });
 });
 
 // Логін
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  try {
-    const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ message: 'Невірний логін або пароль' });
+  const user = await User.findOne({ username });
+  if (!user) return res.status(400).json({ message: 'Invalid username or password' });
+  const ok = await bcrypt.compare(password, user.password);
+  if (!ok) return res.status(400).json({ message: 'Invalid username or password' });
 
-    const isPassValid = await bcrypt.compare(password, user.passwordHash);
-    if (!isPassValid) return res.status(400).json({ message: 'Невірний логін або пароль' });
-
-    const token = jwt.sign(
-      { userId: user._id, username: user.username, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '12h' }
-    );
-
-    res.json({ token });
-  } catch (err) {
-    res.status(500).json({ message: 'Помилка логіну' });
-  }
+  // Створити JWT
+  const token = jwt.sign(
+    { userId: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '12h' }
+  );
+  res.json({ token, role: user.role, username: user.username });
 });
 
 module.exports = router;
