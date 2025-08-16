@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { getPriests, addPriest, updatePriest, deletePriest } from '../api/rotationApi';
+import React, { useState, useEffect } from "react";
+import {
+  getPriests, addPriest, updatePriest, deletePriest,
+} from "../api/rotationApi";
+import PriestEditDialog from "./PriestEditDialog";
 
-export default function PriestListTab({ isAdmin, token }) {
+const PriestListTab = ({ token, isAdmin }) => {
   const [priests, setPriests] = useState([]);
   const [edit, setEdit] = useState(null);
 
@@ -24,7 +27,7 @@ export default function PriestListTab({ isAdmin, token }) {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Видалити священника?')) {
+    if (window.confirm("Видалити священника?")) {
       await deletePriest(id, token);
       fetchPriests();
     }
@@ -32,7 +35,11 @@ export default function PriestListTab({ isAdmin, token }) {
 
   return (
     <div>
-      {isAdmin && <button className="btn" onClick={() => setEdit({})}>+ Додати священника</button>}
+      {isAdmin && (
+        <button className="btn" onClick={() => setEdit({})}>
+          + Додати священника
+        </button>
+      )}
       <div>
         {priests.map(item => (
           <div className="card" key={item._id}>
@@ -40,8 +47,12 @@ export default function PriestListTab({ isAdmin, token }) {
             <div className="card-meta">{item.rank}</div>
             {isAdmin && (
               <div className="card-actions">
-                <button className="btn" onClick={() => setEdit(item)}>Редагувати</button>
-                <button className="btn btn-danger" onClick={() => handleDelete(item._id)}>Видалити</button>
+                <button className="btn" onClick={() => setEdit(item)}>
+                  Редагувати
+                </button>
+                <button className="btn btn-danger" onClick={() => handleDelete(item._id)}>
+                  Видалити
+                </button>
               </div>
             )}
           </div>
@@ -56,4 +67,6 @@ export default function PriestListTab({ isAdmin, token }) {
       )}
     </div>
   );
-}
+};
+
+export default PriestListTab;

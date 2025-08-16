@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { getDeacons, addDeacon, updateDeacon, deleteDeacon } from '../api/rotationApi';
+import React, { useState, useEffect } from "react";
+import {
+  getDeacons, addDeacon, updateDeacon, deleteDeacon,
+} from "../api/rotationApi";
+import DeaconEditDialog from "./DeaconEditDialog";
 
-export default function DeaconListTab({ isAdmin, token }) {
+const DeaconListTab = ({ token, isAdmin }) => {
   const [deacons, setDeacons] = useState([]);
   const [edit, setEdit] = useState(null);
 
@@ -24,7 +27,7 @@ export default function DeaconListTab({ isAdmin, token }) {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Видалити диякона?')) {
+    if (window.confirm("Видалити диякона?")) {
       await deleteDeacon(id, token);
       fetchDeacons();
     }
@@ -32,7 +35,11 @@ export default function DeaconListTab({ isAdmin, token }) {
 
   return (
     <div>
-      {isAdmin && <button className="btn" onClick={() => setEdit({})}>+ Додати диякона</button>}
+      {isAdmin && (
+        <button className="btn" onClick={() => setEdit({})}>
+          + Додати диякона
+        </button>
+      )}
       <div>
         {deacons.map(item => (
           <div className="card" key={item._id}>
@@ -40,8 +47,12 @@ export default function DeaconListTab({ isAdmin, token }) {
             <div className="card-meta">{item.rank}</div>
             {isAdmin && (
               <div className="card-actions">
-                <button className="btn" onClick={() => setEdit(item)}>Редагувати</button>
-                <button className="btn btn-danger" onClick={() => handleDelete(item._id)}>Видалити</button>
+                <button className="btn" onClick={() => setEdit(item)}>
+                  Редагувати
+                </button>
+                <button className="btn btn-danger" onClick={() => handleDelete(item._id)}>
+                  Видалити
+                </button>
               </div>
             )}
           </div>
@@ -56,4 +67,6 @@ export default function DeaconListTab({ isAdmin, token }) {
       )}
     </div>
   );
-}
+};
+
+export default DeaconListTab;

@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { getDeaconSchedules, addDeaconSchedule, updateDeaconSchedule, deleteDeaconSchedule } from '../api/rotationApi';
+import React, { useState, useEffect } from "react";
+import {
+  getDeaconSchedules,
+  addDeaconSchedule,
+  updateDeaconSchedule,
+  deleteDeaconSchedule,
+} from "../api/rotationApi";
+import DeaconScheduleEditDialog from "./DeaconScheduleEditDialog";
 
-export default function DeaconScheduleTab({ isAdmin, token }) {
+const DeaconScheduleTab = ({ token, isAdmin }) => {
   const [schedules, setSchedules] = useState([]);
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
   const [loading, setLoading] = useState(false);
   const [edit, setEdit] = useState(null);
 
   const fetchData = async () => {
     setLoading(true);
-    const res = await getDeaconSchedules(from, to); // реалізуй цей метод на бекенді!
+    const res = await getDeaconSchedules(from, to);
     setSchedules(res.data);
     setLoading(false);
   };
@@ -29,7 +35,7 @@ export default function DeaconScheduleTab({ isAdmin, token }) {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Видалити розклад?')) {
+    if (window.confirm("Видалити розклад?")) {
       await deleteDeaconSchedule(id, token);
       fetchData();
     }
@@ -47,9 +53,7 @@ export default function DeaconScheduleTab({ isAdmin, token }) {
           <button className="btn" onClick={() => setEdit({})}>+ Додати розклад</button>
         )}
       </div>
-
       {loading && <div>Завантаження...</div>}
-
       <div>
         {schedules.map(item => (
           <div className="card" key={item._id}>
@@ -60,14 +64,17 @@ export default function DeaconScheduleTab({ isAdmin, token }) {
             }
             {isAdmin && (
               <div className="card-actions">
-                <button className="btn" onClick={() => setEdit(item)}>Редагувати</button>
-                <button className="btn btn-danger" onClick={() => handleDelete(item._id)}>Видалити</button>
+                <button className="btn" onClick={() => setEdit(item)}>
+                  Редагувати
+                </button>
+                <button className="btn btn-danger" onClick={() => handleDelete(item._id)}>
+                  Видалити
+                </button>
               </div>
             )}
           </div>
         ))}
       </div>
-
       {edit && (
         <DeaconScheduleEditDialog
           initial={edit}
@@ -77,4 +84,6 @@ export default function DeaconScheduleTab({ isAdmin, token }) {
       )}
     </div>
   );
-}
+};
+
+export default DeaconScheduleTab;
