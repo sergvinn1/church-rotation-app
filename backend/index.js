@@ -8,6 +8,9 @@ const priestsRouter = require('./routes/priests');
 const deaconSchedulesRouter = require('./routes/deacon-schedules');
 const priestSchedulesRouter = require('./routes/priest-schedules');
 
+// Додаємо роут для авторизації/реєстрації
+const authRouter = require('./routes/auth');
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -20,6 +23,9 @@ app.use('/api/deacons', deaconsRouter);
 app.use('/api/priests', priestsRouter);
 app.use('/api/deacon-schedules', deaconSchedulesRouter);
 app.use('/api/priest-schedules', priestSchedulesRouter);
+
+// Підключаємо роут для реєстрації
+app.use('/api/auth', authRouter);
 
 app.listen(process.env.PORT || 4000, () => {
   console.log(`Backend запущено на порті ${process.env.PORT || 4000}`);

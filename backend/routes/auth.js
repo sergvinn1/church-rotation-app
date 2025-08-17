@@ -1,33 +1,37 @@
 const express = require('express');
-const router = express.Router();
-const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const User = require('../models/User'); // шлях до вашої моделі користувача
+const router = express.Router();
 
-// Реєстрація
+// Реєстрація нового користувача (у т.ч. адміна)
 router.post('/register', async (req, res) => {
-  const { username, email, password, role } = req.body;
-  const hash = await bcrypt.hash(password, 10);
-  const user = new User({ username, email, password: hash, role: role || 'user' });
-  await user.save();
-  res.status(201).json({ message: 'User registered' });
-});
+  try {
+    const { username, email, password, role } = req.body;
 
-// Логін
-router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  const user = await User.findOne({ username });
-  if (!user) return res.status(400).json({ message: 'Invalid username or password' });
-  const ok = await bcrypt.compare(password, user.password);
-  if (!ok) return res.status(400).json({ message: 'Invalid username or password' });
+    // Перевірка чи користувач вже існує
+    const userExists = await User.findOne({ $or: [{ username }, { email }] });
+    if (userExists) {
+      return res.status(400).json({ message: 'Користувач з таким імʼям або email вже існує!' });
+    }
 
-  // Створити JWT
-  const token = jwt.sign(
-    { userId: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: '12h' }
-  );
-  res.json({ token, role: user.role, username: user.username });
+    // Хешування пароля
+    const hash = await bcrypt.hash(password, 10);
+
+    // Створення користувача
+    const user = new User({
+      username,
+      email,
+      password: hash,
+      role: role || 'user'
+    });
+
+    await user.save();
+
+    res.status(201).json({ message: 'Користувач успішно створений!' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Помилка сервера' });
+  }
 });
 
 module.exports = router;
