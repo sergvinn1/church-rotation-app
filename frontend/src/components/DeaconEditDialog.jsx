@@ -1,37 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const DeaconEditDialog = ({ initial, onClose, onSave }) => {
-  const [form, setForm] = useState({
-    name: initial.name || "",
-    rank: initial.rank || "",
-    _id: initial._id || undefined,
-  });
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+export default function DeaconEditDialog({ initial = {}, onClose, onSave }) {
+  const [name, setName] = useState(initial.name || "");
+  const [rank, setRank] = useState(initial.rank || "");
 
-  const submit = e => {
+  useEffect(() => {
+    setName(initial.name || "");
+    setRank(initial.rank || "");
+  }, [initial, onClose]);
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(form);
+    if (!name.trim() || !rank.trim()) return;
+    onSave({ ...initial, name: name.trim(), rank: rank.trim() });
+    setName("");
+    setRank("");
+  };
+
+  const handleClose = () => {
+    setName("");
+    setRank("");
+    onClose();
   };
 
   return (
-    <div style={{
-      position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-      background: "#34495e88", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999
-    }}>
-      <form className="panel" style={{ maxWidth: 340 }} onSubmit={submit}>
-        <div className="panel-title">{form._id ? "Редагувати" : "Додати"} диякона</div>
-        <label>Ім'я:</label>
-        <input className="input" name="name" value={form.name} onChange={handleChange} required />
-        <label>Сан / ранг:</label>
-        <input className="input" name="rank" value={form.rank} onChange={handleChange} required />
-        <div style={{ marginTop: 18 }}>
-          <button className="btn" type="submit">Зберегти</button>
-          <button className="btn" type="button" onClick={onClose}>Скасувати</button>
+    <div className="church-modal-bg">
+      <form className="church-modal" onSubmit={handleSubmit}>
+        <h3>Додати диякона</h3>
+        <div className="church-form-row">
+          <div style={{ flex: 1 }}>
+            <label>Ім'я</label>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Введіть ім'я"
+              required
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label>Сан</label>
+            <input
+              type="text"
+              value={rank}
+              onChange={e => setRank(e.target.value)}
+              placeholder="напр. диякон, протодиякон..."
+              required
+            />
+          </div>
+        </div>
+        <div className="church-btn-row">
+          <button type="submit" className="btn-save">Зберегти</button>
+          <button type="button" className="btn-cancel" onClick={handleClose}>Скасувати</button>
         </div>
       </form>
     </div>
   );
-};
-
-export default DeaconEditDialog;
+}

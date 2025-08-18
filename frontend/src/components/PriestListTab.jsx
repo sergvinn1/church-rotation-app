@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import {
-  getPriests, addPriest, updatePriest, deletePriest,
-} from "../api/rotationApi";
+import { getPriests, addPriest, updatePriest, deletePriest } from "../api/rotationApi";
 import PriestEditDialog from "./PriestEditDialog";
 
-const PriestListTab = ({ token, isAdmin }) => {
+
+export default function PriestListTab({ token, isAdmin }) {
   const [priests, setPriests] = useState([]);
   const [edit, setEdit] = useState(null);
 
@@ -34,23 +33,26 @@ const PriestListTab = ({ token, isAdmin }) => {
   };
 
   return (
-    <div>
+    <div className="priest-list-container">
+      <div className="priest-list-header">Священники (реєстр)</div>
       {isAdmin && (
-        <button className="btn" onClick={() => setEdit({})}>
+        <button className="priest-list-btn-add" onClick={() => setEdit({})}>
           + Додати священника
         </button>
       )}
       <div>
         {priests.map(item => (
-          <div className="card" key={item._id}>
-            <div className="card-title">{item.name}</div>
-            <div className="card-meta">{item.rank}</div>
+          <div className="priest-card" key={item._id}>
+            <div className="priest-card-info">
+              <div className="priest-card-rank">{item.rank}</div>
+              <div className="priest-card-name">{item.name}</div>
+            </div>
             {isAdmin && (
-              <div className="card-actions">
-                <button className="btn" onClick={() => setEdit(item)}>
+              <div className="priest-card-actions">
+                <button className="btn-edit" onClick={() => setEdit(item)}>
                   Редагувати
                 </button>
-                <button className="btn btn-danger" onClick={() => handleDelete(item._id)}>
+                <button className="btn-delete" onClick={() => handleDelete(item._id)}>
                   Видалити
                 </button>
               </div>
@@ -67,6 +69,4 @@ const PriestListTab = ({ token, isAdmin }) => {
       )}
     </div>
   );
-};
-
-export default PriestListTab;
+}
