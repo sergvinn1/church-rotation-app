@@ -1,100 +1,98 @@
-import React, { useState, useEffect } from "react";
-import {
-  getPriestSchedules,
-  addPriestSchedule,
-  updatePriestSchedule,
-  deletePriestSchedule,
-  getPriests
-} from "../api/rotationApi";
+import React, { useState, useEffect, useMemo } from "react";
 import PriestScheduleEditDialog from "./PriestScheduleEditDialog";
+import PriestScheduleTable from "./PriestScheduleTable";
 
-const PriestScheduleTab = ({ token, isAdmin }) => {
-  const [schedules, setSchedules] = useState([]);
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [edit, setEdit] = useState(null);
-
+export default function PriestScheduleTab({ isAdmin, token }) {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [editData, setEditData] = useState({});
   const [priests, setPriests] = useState([]);
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [schedule, setSchedule] = useState([]);
 
-  const fetchData = async () => {
-    setLoading(true);
-    const res = await getPriestSchedules(from, to);
-    setSchedules(res.data);
-    setLoading(false);
+  // Приклад завантаження священиків
+  useEffect(() => {
+    // тут має бути реальний fetch
+    setPriests([
+      { _id: "1", name: "о. Іван" },
+      { _id: "2", name: "о. Петро" },
+    ]);
+  }, []);
+
+  // Приклад handleSave
+  const handleSave = (record) => {
+    // Додає новий запис або змінює існуючий
+    setSchedule(prev => {
+      if (record._id) {
+        return prev.map(r => r._id === record._id ? record : r);
+      }
+      return [...prev, { ...record, _id: Date.now().toString() }];
+    });
+    setOpenDialog(false);
   };
 
-  const fetchPriests = async () => {
-    const res = await getPriests();
-    setPriests(res.data);
-  };
+  const filteredSchedule = useMemo(() => {
+    if (!dateRange[0] || !dateRange[1]) return [];
+    const start = new Date(dateRange[0]).setHours(0, 0, 0, 0);
+    const end = new Date(dateRange[1]).setHours(23, 59, 59, 999);
+    return schedule.filter(item => {
+      const date = new Date(item.date).getTime();
+      return date >= start && date <= end;
+    });
+  }, [schedule, dateRange]);
 
-  useEffect(() => { fetchData(); }, [from, to]);
-  useEffect(() => { fetchPriests(); }, []);
-
-  const handleAdd = async (data) => {
-    await addPriestSchedule(data, token);
-    fetchData();
-  };
-
-  const handleEdit = async (data) => {
-    await updatePriestSchedule(data._id, data, token);
-    setEdit(null);
-    fetchData();
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Видалити розклад?")) {
-      await deletePriestSchedule(id, token);
-      fetchData();
-    }
-  };
+  const formatDate = date =>
+    date
+      ? new Date(date).toISOString().slice(0, 10)
+      : "";
 
   return (
     <div>
-      <div className="filter-row">
-        <span className="filter-label">З:</span>
-        <input className="input" type="date" value={from} onChange={e => setFrom(e.target.value)} />
-        <span className="filter-label">По:</span>
-        <input className="input" type="date" value={to} onChange={e => setTo(e.target.value)} />
-        <button className="btn" onClick={fetchData}>Показати</button>
+      <div className="priest-schedule-header">
+        <span>Розклад священників</span>
         {isAdmin && (
-          <button className="btn" onClick={() => setEdit({})}>+ Додати розклад</button>
+          <button
+            className="priest-list-btn-add"
+            onClick={() => { setEditData({}); setOpenDialog(true); }}
+            style={{marginBottom: 0}}
+          >
+            Додати/редагувати розклад
+          </button>
         )}
       </div>
-      {loading && <div>Завантаження...</div>}
-      <div>
-        {schedules.map(item => (
-          <div className="card" key={item._id}>
-            <div className="card-title">{item.date}</div>
-            <div className="card-meta">
-              Служащий: <b>{item.priest}</b><br />
-              Черговий по храму: <b>{item.church_duty}</b><br />
-              Черговий по місту: <b>{item.city_duty}</b>
-            </div>
-            {isAdmin && (
-              <div className="card-actions">
-                <button className="btn" onClick={() => setEdit(item)}>
-                  Редагувати
-                </button>
-                <button className="btn btn-danger" onClick={() => handleDelete(item._id)}>
-                  Видалити
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-      {edit && (
-        <PriestScheduleEditDialog
-          initial={edit}
-          priests={priests}
-          onClose={() => setEdit(null)}
-          onSave={edit._id ? handleEdit : handleAdd}
+      <div style={{display: "flex", alignItems: "center", gap: 16, marginBottom: 20}}>
+        <label style={{fontWeight: 600}}>Діапазон дат:</label>
+        <input
+          type="date"
+          value={formatDate(dateRange[0])}
+          max={formatDate(dateRange[1]) || ""}
+          onChange={e => setDateRange([e.target.value ? new Date(e.target.value) : null, dateRange[1]])}
+          className="church-input"
         />
+        <span style={{fontWeight: 600, fontSize: 17}}>—</span>
+        <input
+          type="date"
+          value={formatDate(dateRange[1])}
+          min={formatDate(dateRange[0]) || ""}
+          onChange={e => setDateRange([dateRange[0], e.target.value ? new Date(e.target.value) : null])}
+          className="church-input"
+        />
+      </div>
+      {isAdmin && (
+        <PriestScheduleEditDialog
+          open={openDialog}
+          initial={editData}
+          priests={priests}
+          onClose={() => setOpenDialog(false)}
+          onSave={handleSave}
+        />
+      )}
+      {!dateRange[0] || !dateRange[1] ? (
+        <div style={{marginTop: 12, color: "#888", fontStyle: "italic"}}>
+          Оберіть діапазон дат для перегляду розкладу.
+        </div>
+      ) : (
+        <PriestScheduleTable schedule={filteredSchedule} />
       )}
     </div>
   );
-};
-
-export default PriestScheduleTab;
+}

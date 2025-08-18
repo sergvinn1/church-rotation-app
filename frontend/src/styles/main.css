@@ -255,3 +255,55 @@ body {
 .priest-card-actions .btn-delete {
   background: #e4573d; color: #fff;
 }
+
+/* Додаємо стилі для розкладу священників */
+.priest-schedule-header {
+  font-size: 1.4em;
+  font-weight: 700;
+  color: #20334c;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.church-input {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-family: var(--font-main);
+  font-size: 1em;
+  outline: none;
+  transition: border 0.14s;
+}
+
+.church-input:focus {
+  border: 1.5px solid var(--main-blue);
+}
+
+/* Стилі для таблиці */
+.priest-schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--main-light);
+  border-radius: 10px;
+  box-shadow: 0 1px 8px #34495e17;
+  font-family: var(--font-main);
+}
+
+.priest-schedule-table th {
+  background: var(--main-blue);
+  color: #fff;
+  font-weight: 700;
+  font-size: 17px;
+  padding: 13px 11px;
+  border-bottom: 3px solid var(--tab-inactive);
+  text-align: left;
+}
+.priest-schedule-table td {
+  background: #fff;
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--tab-inactive);
+  font-size: 16px;
+}

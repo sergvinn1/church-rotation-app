@@ -1,13 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const PriestScheduleEditDialog = ({ initial, priests, onClose, onSave }) => {
+const PriestScheduleEditDialog = ({ open, initial, priests, onClose, onSave }) => {
   const [form, setForm] = useState({
-    date: initial.date || "",
-    priest: initial.priest || "",
-    church_duty: initial.church_duty || "",
-    city_duty: initial.city_duty || "",
-    _id: initial._id || undefined,
+    date: initial?.date || "",
+    priest: initial?.priest || "",
+    church_duty: initial?.church_duty || "",
+    city_duty: initial?.city_duty || "",
+    _id: initial?._id || undefined,
   });
+
+  // Оновлюємо форму при зміні initial (наприклад, при редагуванні)
+  useEffect(() => {
+    setForm({
+      date: initial?.date || "",
+      priest: initial?.priest || "",
+      church_duty: initial?.church_duty || "",
+      city_duty: initial?.city_duty || "",
+      _id: initial?._id || undefined,
+    });
+  }, [initial]);
+
+  if (!open) return null; // Головна умова!
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -20,8 +33,8 @@ const PriestScheduleEditDialog = ({ initial, priests, onClose, onSave }) => {
     <div style={{
       position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
       background: "#34495e88", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999
-    }}>
-      <form className="panel" style={{ maxWidth: 340 }} onSubmit={submit}>
+    }} onClick={onClose}>
+      <form className="panel" style={{ maxWidth: 340 }} onSubmit={submit} onClick={e => e.stopPropagation()}>
         <div className="panel-title">{form._id ? "Редагувати" : "Додати"} розклад священника</div>
         <label>Дата:</label>
         <input className="input" type="date" name="date" value={form.date} onChange={handleChange} required />
