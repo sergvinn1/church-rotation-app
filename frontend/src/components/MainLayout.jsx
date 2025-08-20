@@ -26,6 +26,27 @@ export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
   const [showLogin, setShowLogin] = useState(false);
   const [scheduleTab, setScheduleTab] = useState('priest'); // priest / deacon
 
+  // ---- ДОДАЙ ОСЬ ЦЕ ----
+  // ЄДИНИЙ state ДЛЯ ВСІХ СВЯЩЕННИКІВ (і для реєстру, і для розкладу)
+  const [priests, setPriests] = useState([
+    { _id: "1", name: "Віталій Голоскевич", rank: "протоієрей" },
+    { _id: "2", name: "Вячеслав Буданевич", rank: "протоієрей" }
+  ]);
+  const handleAddOrEditPriest = (priest) => {
+    if (priest._id) {
+      setPriests(prev =>
+        prev.map(p => (p._id === priest._id ? priest : p))
+      );
+    } else {
+      setPriests(prev => [
+        ...prev,
+        { ...priest, _id: Date.now().toString() + Math.random() }
+      ]);
+    }
+  };
+  const handleDeletePriest = _id => setPriests(prev => prev.filter(p => p._id !== _id));
+  // ---- ДОДАЙ ОСЬ ЦЕ ----
+
   return (
     <div>
       <div className="header" style={{position: 'relative'}}>
@@ -73,14 +94,22 @@ export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
                 Диякони
               </button>
             </div>
-            {scheduleTab === 'priest' && <PriestScheduleTab isAdmin={isAdmin} token={token} />}
+            {scheduleTab === 'priest' && <PriestScheduleTab isAdmin={isAdmin} token={token} priests={priests} />}
             {scheduleTab === 'deacon' && <DeaconScheduleTab isAdmin={isAdmin} token={token} />}
           </>
         )}
         {tab === 'icons' && <IconsTab />}
         {tab === 'akathists' && <AkathistsTab />}
         {tab === 'prayers' && <PrayersTab />}
-        {tab === 'priests' && isAdmin && <PriestListTab isAdmin={isAdmin} token={token} />}
+        {tab === 'priests' && isAdmin &&
+          <PriestListTab
+            isAdmin={isAdmin}
+            token={token}
+            priests={priests}
+            onSave={handleAddOrEditPriest}
+            onDelete={handleDeletePriest}
+          />
+        }
         {tab === 'deacons' && isAdmin && <DeaconListTab isAdmin={isAdmin} token={token} />}
       </div>
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 
-
 export default function PriestEditDialog({ initial = {}, onClose, onSave }) {
   const [name, setName] = useState(initial.name || "");
   const [rank, setRank] = useState(initial.rank || "");

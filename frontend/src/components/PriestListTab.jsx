@@ -1,70 +1,47 @@
-import React, { useState, useEffect } from "react";
-import { getPriests, addPriest, updatePriest, deletePriest } from "../api/rotationApi";
+import React, { useState } from "react";
 import PriestEditDialog from "./PriestEditDialog";
 
-
-export default function PriestListTab({ token, isAdmin }) {
-  const [priests, setPriests] = useState([]);
-  const [edit, setEdit] = useState(null);
-
-  const fetchPriests = async () => {
-    const res = await getPriests();
-    setPriests(res.data);
-  };
-
-  useEffect(() => { fetchPriests(); }, []);
-
-  const handleAdd = async (data) => {
-    await addPriest(data, token);
-    fetchPriests();
-  };
-
-  const handleEdit = async (data) => {
-    await updatePriest(data._id, data, token);
-    setEdit(null);
-    fetchPriests();
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Видалити священника?")) {
-      await deletePriest(id, token);
-      fetchPriests();
-    }
-  };
+export default function PriestListTab({ priests, onSave, onDelete, isAdmin }) {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [editPriest, setEditPriest] = useState(null);
 
   return (
-    <div className="priest-list-container">
-      <div className="priest-list-header">Священники (реєстр)</div>
+    <div style={{ maxWidth: 500, margin: "0 auto" }}>
+      <h3>Священники (реєстр)</h3>
       {isAdmin && (
-        <button className="priest-list-btn-add" onClick={() => setEdit({})}>
+        <button
+          className="btn btn-green"
+          style={{ marginBottom: 16 }}
+          onClick={() => { setEditPriest(null); setOpenDialog(true); }}
+        >
           + Додати священника
         </button>
       )}
       <div>
-        {priests.map(item => (
-          <div className="priest-card" key={item._id}>
-            <div className="priest-card-info">
-              <div className="priest-card-rank">{item.rank}</div>
-              <div className="priest-card-name">{item.name}</div>
-            </div>
+        {priests.length === 0 && (
+          <div style={{ color: "#888", fontStyle: "italic" }}>Священників поки що немає</div>
+        )}
+        {priests.map(priest => (
+          <div key={priest._id} style={{
+            background: "#fff", borderRadius: 8, marginBottom: 12, padding: 12, boxShadow: "0 1px 6px #e2e2e2",
+            display: "flex", alignItems: "center", gap: 12
+          }}>
+            <span style={{ color: "green" }}>{priest.rank}</span>
+            <span style={{ fontWeight: 600 }}>{priest.name}</span>
             {isAdmin && (
-              <div className="priest-card-actions">
-                <button className="btn-edit" onClick={() => setEdit(item)}>
-                  Редагувати
-                </button>
-                <button className="btn-delete" onClick={() => handleDelete(item._id)}>
-                  Видалити
-                </button>
-              </div>
+              <>
+                <button className="btn btn-blue" onClick={() => { setEditPriest(priest); setOpenDialog(true); }}>Редагувати</button>
+                <button className="btn btn-red" onClick={() => onDelete(priest._id)}>Видалити</button>
+              </>
             )}
           </div>
         ))}
       </div>
-      {edit && (
+      {openDialog && (
         <PriestEditDialog
-          initial={edit}
-          onClose={() => setEdit(null)}
-          onSave={edit._id ? handleEdit : handleAdd}
+          initial={editPriest || {}}
+          onClose={() => setOpenDialog(false)}
+          onSave={p => { onSave(editPriest ? { ...editPriest, ...p } : p); setOpenDialog(false); }}
         />
       )}
     </div>
