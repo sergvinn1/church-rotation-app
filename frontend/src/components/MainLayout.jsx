@@ -66,14 +66,20 @@ export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
   }, [scheduleRange]);
 
   // --- Додати/редагувати/видалити розклад ---
-  const handleAddOrEditSchedule = async (entry) => {
-    if (entry._id) {
-      await updatePriestSchedule(entry._id, entry, token);
+  // ОНОВЛЕНА ФУНКЦІЯ: підтримує масове додавання!
+  const handleAddOrEditSchedule = async (entryOrEntries) => {
+    if (Array.isArray(entryOrEntries)) {
+      for (const entry of entryOrEntries) {
+        await addPriestSchedule(entry, token);
+      }
+    } else if (entryOrEntries._id) {
+      await updatePriestSchedule(entryOrEntries._id, entryOrEntries, token);
     } else {
-      await addPriestSchedule(entry, token);
+      await addPriestSchedule(entryOrEntries, token);
     }
     fetchPriestSchedule();
   };
+
   const handleDeleteSchedule = async (_id) => {
     await deletePriestSchedule(_id, token);
     fetchPriestSchedule();

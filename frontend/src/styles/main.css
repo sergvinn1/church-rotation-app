@@ -359,6 +359,42 @@ body {
   color: #333;
   font-weight: 500;
 }
+
+.btn-blue {
+  background: #1388c7;
+  color: #fff;
+  font-weight: 600;
+  transition: background .18s;
+}
+.btn-blue:hover {
+  background: #0c6391;
+}
+
+.btn-red, .btn-danger {
+  background: #e4573d;
+  color: #fff;
+  font-weight: 600;
+  transition: background .18s;
+}
+.btn-red:hover, .btn-danger:hover {
+  background: #b03c1a;
+}
+
+.btn-edit {
+  background: #1388c7;
+  color: #fff;
+}
+.btn-edit:hover {
+  background: #0c6391;
+}
+
+.btn-delete {
+  background: #e4573d;
+  color: #fff;
+}
+.btn-delete:hover {
+  background: #b03c1a;
+}
 .church-input {
   padding: 7px;
   border-radius: 6px;
@@ -392,4 +428,38 @@ body {
   font-weight: 600;
   margin-bottom: 6px;
   font-size: 1.08em;
+}
+
+.priest-schedule-card {
+  background: #f8fafc;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 20px 28px;
+  margin: 18px 0;
+  max-width: 430px;
+  font-size: 16px;
+}
+.card-header {
+  font-size: 18px;
+  margin-bottom: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+.card-label {
+  font-weight: 500;
+  color: #23609b;
+  margin-right: 10px;
+}
+.card-value {
+  font-weight: 600;
+  color: #222;
+}
+.card-body > div {
+  margin-bottom: 10px;
+}
+.card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
 }
