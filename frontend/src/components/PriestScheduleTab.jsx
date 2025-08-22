@@ -1,50 +1,23 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import PriestScheduleEditDialog from "./PriestScheduleEditDialog";
 import PriestScheduleTable from "./PriestScheduleTable";
 
-export default function PriestScheduleTab({ priests, isAdmin }) {
+export default function PriestScheduleTab({
+  priests, isAdmin, schedule, onSave, onDelete, dateRange, setDateRange
+}) {
   const [openDialog, setOpenDialog] = useState(false);
   const [editData, setEditData] = useState({});
-  const [dateRange, setDateRange] = useState([null, null]);
-  const [schedule, setSchedule] = useState([]);
-
-  // Додаємо записи до розкладу
-  const handleSave = (records) => {
-    setSchedule(prev => [
-      ...prev,
-      ...records.map(r => ({
-        ...r,
-        _id: r._id || (Date.now().toString() + Math.random())
-      }))
-    ]);
-    setOpenDialog(false);
-  };
-
-  // Фільтрація розкладу за діапазоном
-  const filteredSchedule = useMemo(() => {
-    if (!dateRange[0] || !dateRange[1]) return [];
-    const start = new Date(dateRange[0]).setHours(0, 0, 0, 0);
-    const end = new Date(dateRange[1]).setHours(23, 59, 59, 999);
-    return schedule.filter(item => {
-      const date = new Date(item.date).getTime();
-      return date >= start && date <= end;
-    });
-  }, [schedule, dateRange]);
 
   const formatDate = date =>
-    date ? new Date(date).toISOString().slice(0, 10) : "";
+    date ? (typeof date === "string" ? date.slice(0, 10) : new Date(date).toISOString().slice(0, 10)) : "";
 
   return (
     <div>
       <div className="priest-schedule-header">
         <span>Розклад священників</span>
         {isAdmin && (
-          <button
-            className="priest-list-btn-add"
-            onClick={() => { setEditData({}); setOpenDialog(true); }}
-            style={{ marginBottom: 0 }}
-          >
-            Додати/редагувати розклад
+          <button className="priest-list-btn-add" onClick={() => { setEditData({}); setOpenDialog(true); }}>
+            Додати розклад
           </button>
         )}
       </div>
@@ -72,7 +45,7 @@ export default function PriestScheduleTab({ priests, isAdmin }) {
           initial={editData}
           priests={priests}
           onClose={() => setOpenDialog(false)}
-          onSave={handleSave}
+          onSave={onSave}
           dateRange={dateRange}
         />
       )}
@@ -82,8 +55,11 @@ export default function PriestScheduleTab({ priests, isAdmin }) {
         </div>
       ) : (
         <PriestScheduleTable
-          schedule={filteredSchedule}
+          schedule={schedule}
           priests={priests}
+          onDelete={onDelete}
+          onEdit={entry => { setEditData(entry); setOpenDialog(true); }}
+          isAdmin={isAdmin}
         />
       )}
     </div>

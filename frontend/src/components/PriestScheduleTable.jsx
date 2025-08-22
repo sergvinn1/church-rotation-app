@@ -1,28 +1,38 @@
 import React from "react";
 
-// schedule = масив { date, priest, church_duty, city_duty, _id }
-// priests = масив { _id, name, rank }
-function priestNameById(id, priests) {
-  const p = priests.find(pr => pr._id === id);
-  return p ? `${p.rank} ${p.name}` : "—";
-}
+export default function PriestScheduleTable({ schedule, priests, onDelete, onEdit, isAdmin }) {
+  const getPriestName = id => priests.find(p => p._id === id)?.name || id;
 
-const PriestScheduleTable = ({ schedule, priests }) => {
-  if (!schedule.length) {
-    return <div style={{ color: "#888", fontStyle: "italic", marginTop: 16 }}>Немає даних для вибраного діапазону.</div>;
-  }
+  if (!schedule.length)
+    return <div style={{ color: "#888", fontStyle: "italic" }}>Розклад відсутній</div>;
+
   return (
-    <div className="schedule-cards-container">
-      {schedule.map((item, idx) => (
-        <div className="schedule-card" key={item._id || idx}>
-          <div className="schedule-card-date">{new Date(item.date).toLocaleDateString()}</div>
-          <div><b>Служащий:</b> {priestNameById(item.priest, priests)}</div>
-          <div><b>Черговий по храму:</b> {priestNameById(item.church_duty, priests)}</div>
-          <div><b>Черговий по місту:</b> {priestNameById(item.city_duty, priests)}</div>
-        </div>
-      ))}
-    </div>
+    <table className="church-table">
+      <thead>
+        <tr>
+          <th>Дата</th>
+          <th>Служащий</th>
+          <th>Черговий по храму</th>
+          <th>Черговий по місту</th>
+          {isAdmin && <th />}
+        </tr>
+      </thead>
+      <tbody>
+        {schedule.map(item => (
+          <tr key={item._id}>
+            <td>{item.date}</td>
+            <td>{getPriestName(item.priest)}</td>
+            <td>{getPriestName(item.church_duty)}</td>
+            <td>{getPriestName(item.city_duty)}</td>
+            {isAdmin && (
+              <td>
+                <button className="btn btn-blue" onClick={() => onEdit(item)}>Редагувати</button>
+                <button className="btn btn-red" onClick={() => onDelete(item._id)}>Видалити</button>
+              </td>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
-};
-
-export default PriestScheduleTable;
+}

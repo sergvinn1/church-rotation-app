@@ -9,11 +9,8 @@ export default function PriestListTab({ priests, onSave, onDelete, isAdmin }) {
     <div style={{ maxWidth: 500, margin: "0 auto" }}>
       <h3>Священники (реєстр)</h3>
       {isAdmin && (
-        <button
-          className="btn btn-green"
-          style={{ marginBottom: 16 }}
-          onClick={() => { setEditPriest(null); setOpenDialog(true); }}
-        >
+        <button className="btn btn-green" style={{ marginBottom: 16 }}
+          onClick={() => { setEditPriest(null); setOpenDialog(true); }}>
           + Додати священника
         </button>
       )}

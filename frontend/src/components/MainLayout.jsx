@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PriestScheduleTab from './PriestScheduleTab';
 import DeaconScheduleTab from './DeaconScheduleTab';
 import PriestListTab from './PriestListTab';
@@ -7,6 +7,10 @@ import IconsTab from './IconsTab';
 import AkathistsTab from './AkathistsTab';
 import PrayersTab from './PrayersTab';
 import LoginDialog from './LoginDialog';
+import {
+  getPriests, addPriest, updatePriest, deletePriest,
+  getPriestSchedules, addPriestSchedule, updatePriestSchedule, deletePriestSchedule
+} from '../api/rotationApi';
 import '../styles/main.css';
 
 const TABS = [
@@ -15,7 +19,6 @@ const TABS = [
   { label: 'Акафісти', value: 'akathists' },
   { label: 'Молитовні чини', value: 'prayers' }
 ];
-
 const ADMIN_TABS = [
   { label: 'Священники (реєстр)', value: 'priests' },
   { label: 'Диякони (реєстр)', value: 'deacons' }
@@ -26,26 +29,70 @@ export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
   const [showLogin, setShowLogin] = useState(false);
   const [scheduleTab, setScheduleTab] = useState('priest'); // priest / deacon
 
-  // ---- ДОДАЙ ОСЬ ЦЕ ----
-  // ЄДИНИЙ state ДЛЯ ВСІХ СВЯЩЕННИКІВ (і для реєстру, і для розкладу)
-  const [priests, setPriests] = useState([
-    { _id: "1", name: "Віталій Голоскевич", rank: "протоієрей" },
-    { _id: "2", name: "Вячеслав Буданевич", rank: "протоієрей" }
-  ]);
-  const handleAddOrEditPriest = (priest) => {
+  // --- Священники ---
+  const [priests, setPriests] = useState([]);
+  // --- Розклад священників ---
+  const [schedule, setSchedule] = useState([]);
+  // --- Діапазон для розкладу ---
+  const [scheduleRange, setScheduleRange] = useState([null, null]);
+
+  // --- Завантажити священників ---
+  const fetchPriests = useCallback(() => {
+    getPriests().then(res => setPriests(res.data));
+  }, []);
+
+  // --- Додати/редагувати/видалити священника ---
+  const handleAddOrEditPriest = async (priest) => {
     if (priest._id) {
-      setPriests(prev =>
-        prev.map(p => (p._id === priest._id ? priest : p))
-      );
+      await updatePriest(priest._id, priest, token);
     } else {
-      setPriests(prev => [
-        ...prev,
-        { ...priest, _id: Date.now().toString() + Math.random() }
-      ]);
+      await addPriest(priest, token);
     }
+    fetchPriests();
   };
-  const handleDeletePriest = _id => setPriests(prev => prev.filter(p => p._id !== _id));
-  // ---- ДОДАЙ ОСЬ ЦЕ ----
+  const handleDeletePriest = async (_id) => {
+    await deletePriest(_id, token);
+    fetchPriests();
+  };
+
+  // --- Завантажити розклад ---
+  const fetchPriestSchedule = useCallback(() => {
+    const [from, to] = scheduleRange;
+    if (from && to) {
+      getPriestSchedules(formatDate(from), formatDate(to)).then(res => setSchedule(res.data));
+    } else {
+      setSchedule([]);
+    }
+  }, [scheduleRange]);
+
+  // --- Додати/редагувати/видалити розклад ---
+  const handleAddOrEditSchedule = async (entry) => {
+    if (entry._id) {
+      await updatePriestSchedule(entry._id, entry, token);
+    } else {
+      await addPriestSchedule(entry, token);
+    }
+    fetchPriestSchedule();
+  };
+  const handleDeleteSchedule = async (_id) => {
+    await deletePriestSchedule(_id, token);
+    fetchPriestSchedule();
+  };
+
+  // --- useEffect on mount ---
+  useEffect(() => {
+    fetchPriests();
+  }, [fetchPriests]);
+
+  useEffect(() => {
+    fetchPriestSchedule();
+  }, [fetchPriestSchedule]);
+
+  function formatDate(date) {
+    if (!date) return '';
+    if (typeof date === 'string') return date.slice(0, 10);
+    return date.toISOString().slice(0, 10);
+  }
 
   return (
     <div>
@@ -58,20 +105,12 @@ export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
 
       <div className="tabs">
         {TABS.map(t => (
-          <button
-            key={t.value}
-            className={`tab-btn ${tab === t.value ? 'active' : ''}`}
-            onClick={() => setTab(t.value)}
-          >
+          <button key={t.value} className={`tab-btn ${tab === t.value ? 'active' : ''}`} onClick={() => setTab(t.value)}>
             {t.label}
           </button>
         ))}
         {isAdmin && ADMIN_TABS.map(t => (
-          <button
-            key={t.value}
-            className={`tab-btn ${tab === t.value ? 'active' : ''}`}
-            onClick={() => setTab(t.value)}
-          >
+          <button key={t.value} className={`tab-btn ${tab === t.value ? 'active' : ''}`} onClick={() => setTab(t.value)}>
             {t.label}
           </button>
         ))}
@@ -81,27 +120,32 @@ export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
         {tab === 'schedule' && (
           <>
             <div className="sub-tabs">
-              <button
-                className={`sub-tab-btn ${scheduleTab === 'priest' ? 'active' : ''}`}
-                onClick={() => setScheduleTab('priest')}
-              >
+              <button className={`sub-tab-btn ${scheduleTab === 'priest' ? 'active' : ''}`} onClick={() => setScheduleTab('priest')}>
                 Священники
               </button>
-              <button
-                className={`sub-tab-btn ${scheduleTab === 'deacon' ? 'active' : ''}`}
-                onClick={() => setScheduleTab('deacon')}
-              >
+              <button className={`sub-tab-btn ${scheduleTab === 'deacon' ? 'active' : ''}`} onClick={() => setScheduleTab('deacon')}>
                 Диякони
               </button>
             </div>
-            {scheduleTab === 'priest' && <PriestScheduleTab isAdmin={isAdmin} token={token} priests={priests} />}
+            {scheduleTab === 'priest' && (
+              <PriestScheduleTab
+                isAdmin={isAdmin}
+                token={token}
+                priests={priests}
+                schedule={schedule}
+                onSave={handleAddOrEditSchedule}
+                onDelete={handleDeleteSchedule}
+                dateRange={scheduleRange}
+                setDateRange={setScheduleRange}
+              />
+            )}
             {scheduleTab === 'deacon' && <DeaconScheduleTab isAdmin={isAdmin} token={token} />}
           </>
         )}
         {tab === 'icons' && <IconsTab />}
         {tab === 'akathists' && <AkathistsTab />}
         {tab === 'prayers' && <PrayersTab />}
-        {tab === 'priests' && isAdmin &&
+        {tab === 'priests' && isAdmin && (
           <PriestListTab
             isAdmin={isAdmin}
             token={token}
@@ -109,7 +153,7 @@ export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
             onSave={handleAddOrEditPriest}
             onDelete={handleDeletePriest}
           />
-        }
+        )}
         {tab === 'deacons' && isAdmin && <DeaconListTab isAdmin={isAdmin} token={token} />}
       </div>
 
