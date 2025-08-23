@@ -148,7 +148,7 @@ export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
             {scheduleTab === 'deacon' && <DeaconScheduleTab isAdmin={isAdmin} token={token} />}
           </>
         )}
-        {tab === 'icons' && <IconsTab />}
+        {tab === 'icons' && <IconsTab isAdmin={isAdmin} />}
         {tab === 'akathists' && <AkathistsTab />}
         {tab === 'prayers' && <PrayersTab />}
         {tab === 'priests' && isAdmin && (
