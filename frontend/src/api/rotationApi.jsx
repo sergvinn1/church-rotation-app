@@ -62,3 +62,16 @@ export const deletePriestSchedule = (id, token) =>
   axios.delete(`${BASE_URL}/priest-schedules/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+export const getDeaconAkathists = (date) =>
+  axios.get("/api/deacon-akathists", { params: { date } });
+
+export const addDeaconAkathist = (data, token) =>
+  axios.post("/api/deacon-akathists", data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+export const deleteDeaconAkathist = (id, token) =>
+  axios.delete(`/api/deacon-akathists/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });

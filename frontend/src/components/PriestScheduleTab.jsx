@@ -33,7 +33,7 @@ function groupScheduleByComposition(schedule) {
 }
 
 export default function PriestScheduleTab({
-  priests, isAdmin, token, schedule, onSave, onDelete, dateRange, setDateRange
+  priests, isAdmin, schedule, onSave, onDelete, dateRange, setDateRange
 }) {
   const [openDialog, setOpenDialog] = useState(false);
   const [editData, setEditData] = useState({});

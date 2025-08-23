@@ -1,31 +1,33 @@
 import React, { useState, useEffect } from "react";
 
-// props: initial, deacons, open, onClose, onSave
-export default function DeaconScheduleEditDialog({ 
-  open, initial = {}, deacons = [], onClose, onSave 
+export default function DeaconAkathistEditDialog({
+  open,
+  initial = {},
+  deacons = [],
+  onClose,
+  onSave
 }) {
-  const [startDate, setStartDate] = useState(initial.startDate || "");
-  const [endDate, setEndDate] = useState(initial.endDate || "");
-  const [deaconId, setDeaconId] = useState(initial.deacon || "");
+  const [akathistDate, setAkathistDate] = useState(initial.akathistDate || "");
+  const [deaconId, setDeaconId] = useState(initial.akathistDeacon || "");
 
   useEffect(() => {
-    setStartDate(initial.startDate || "");
-    setEndDate(initial.endDate || "");
-    setDeaconId(initial.deacon || "");
+    setAkathistDate(initial.akathistDate || "");
+    setDeaconId(initial.akathistDeacon || "");
   }, [initial, open]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!startDate || !endDate || !deaconId) {
+    if (!akathistDate || !deaconId) {
       alert("Заповніть всі поля!");
       return;
     }
-    onSave({
-      ...initial,
-      startDate,
-      endDate,
-      deacon: deaconId,
-    });
+    if (typeof onSave === "function") {
+      onSave({
+        ...initial,
+        akathistDate,
+        akathistDeacon: deaconId,
+      });
+    }
   };
 
   if (!open) return null;
@@ -34,33 +36,20 @@ export default function DeaconScheduleEditDialog({
     <div className="church-modal-bg">
       <form className="church-modal" onSubmit={handleSubmit}>
         <div className="modal-title">
-          Додати розклад диякона на тиждень
+          Додати розклад акафісту для диякона
         </div>
         <div className="church-form-row">
           <div style={{ flex: 1 }}>
-            <label>З (дата початку):</label>
+            <label>Дата акафісту:</label>
             <input
               type="date"
               className="church-input"
-              value={startDate}
-              onChange={e => setStartDate(e.target.value)}
+              value={akathistDate}
+              onChange={e => setAkathistDate(e.target.value)}
               required
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label>По (дата кінця):</label>
-            <input
-              type="date"
-              className="church-input"
-              value={endDate}
-              min={startDate || ""}
-              onChange={e => setEndDate(e.target.value)}
-              required
-            />
-          </div>
-        </div>
-        <div className="church-form-row">
-          <div style={{ width: "100%" }}>
             <label>Диякон:</label>
             <select
               className="church-input"
@@ -70,7 +59,9 @@ export default function DeaconScheduleEditDialog({
             >
               <option value="">Оберіть диякона</option>
               {deacons.map(d => (
-                <option key={d._id} value={d._id}>{d.name}</option>
+                <option key={d._id} value={d._id}>
+                  {(d.rank ? d.rank + " " : "") + d.name}
+                </option>
               ))}
             </select>
           </div>
