@@ -5,13 +5,14 @@ import PriestListTab from './PriestListTab';
 import DeaconListTab from './DeaconListTab';
 import IconsTab from './IconsTab';
 import AkathistsTab from './AkathistsTab';
-import PrayersTab from './PrayersTab';
+import PrayerRitesTab from './PrayerRitesTab';
 import LoginDialog from './LoginDialog';
 import {
   getPriests, addPriest, updatePriest, deletePriest,
   getPriestSchedules, addPriestSchedule, updatePriestSchedule, deletePriestSchedule
 } from '../api/rotationApi';
 import '../styles/main.css';
+
 
 const TABS = [
   { label: 'Розклад духовенства', value: 'schedule' },
@@ -150,7 +151,7 @@ export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
         )}
         {tab === 'icons' && <IconsTab isAdmin={isAdmin} />}
         {tab === 'akathists' && <AkathistsTab isAdmin={isAdmin} />}
-        {tab === 'prayers' && <PrayersTab />}
+        {tab === 'prayers' && <PrayerRitesTab isAdmin={isAdmin}/>}
         {tab === 'priests' && isAdmin && (
           <PriestListTab
             isAdmin={isAdmin}

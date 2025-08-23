@@ -10,7 +10,6 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        {/* Всі основні сторінки — через MainLayout */}
         <Route
           path="/*"
           element={
@@ -22,7 +21,6 @@ export default function App() {
             />
           }
         />
-        {/* Сторінка реєстрації адміна окремо */}
         <Route path="/admin-register" element={<AdminRegisterForm />} />
       </Routes>
     </Router>
