@@ -149,7 +149,7 @@ export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
           </>
         )}
         {tab === 'icons' && <IconsTab isAdmin={isAdmin} />}
-        {tab === 'akathists' && <AkathistsTab />}
+        {tab === 'akathists' && <AkathistsTab isAdmin={isAdmin} />}
         {tab === 'prayers' && <PrayersTab />}
         {tab === 'priests' && isAdmin && (
           <PriestListTab

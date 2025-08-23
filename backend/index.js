@@ -9,6 +9,7 @@ const deaconSchedulesRouter = require('./routes/deacon-schedules');
 const priestSchedulesRouter = require('./routes/priest-schedules');
 const deaconAkathists = require('./routes/deacon-akathists');
 const iconsRouter = require('./routes/icons');
+const akathists = require("./routes/akathists");
 
 
 
@@ -29,6 +30,7 @@ app.use('/api/deacon-schedules', deaconSchedulesRouter);
 app.use('/api/priest-schedules', priestSchedulesRouter);
 app.use('/api/deacon-akathists', deaconAkathists);
 app.use('/api/icons', iconsRouter);
+app.use("/api/akathists", akathists);
 
 // Підключаємо роут для реєстрації
 app.use('/api/auth', authRouter);
