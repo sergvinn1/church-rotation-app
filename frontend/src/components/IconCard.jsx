@@ -1,21 +1,58 @@
+import React from "react";
+
 export default function IconCard({ icon, isAdmin, onEdit, onDelete }) {
-    return (
-      <div className="icon-card">
-        {icon.photo && (
-          <img src={icon.photo} alt={icon.name} className="icon-photo" />
-        )}
-        <div>
-          <b>{icon.name}</b>
-          <div>Номер: {icon.number}</div>
-          <div>Шафа: {icon.shelf}</div>
-          {icon.note && <div className="icon-note">{icon.note}</div>}
-        </div>
-        {isAdmin && (
-          <div className="icon-card-actions">
-            <button className="btn btn-blue" onClick={onEdit}>Редагувати</button>
-            <button className="btn btn-gray" onClick={onDelete}>Видалити</button>
-          </div>
-        )}
+  return (
+    <div
+      style={{
+        background: "var(--panel-bg)",
+        borderRadius: "18px",
+        boxShadow: "var(--shadow)",
+        padding: "22px 28px 16px 28px",
+        minWidth: 220,
+        maxWidth: 320,
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+        position: "relative",
+      }}
+    >
+      {/* Фото ікони (якщо є) */}
+      {icon.photo && (
+        <img
+          src={icon.photo}
+          alt={icon.name}
+          style={{
+            width: "100%",
+            borderRadius: "12px",
+            marginBottom: "12px",
+            objectFit: "cover",
+            maxHeight: "160px",
+            background: "#f5f8fa",
+          }}
+        />
+      )}
+
+      <div style={{ fontWeight: 700, fontSize: "1.18em", marginBottom: 7, color: "var(--main-blue)" }}>
+        {icon.name}
       </div>
-    );
-  }
+      <div style={{ display: "flex", gap: 18, fontSize: "1em", marginBottom: 4 }}>
+        <div>
+          <span style={{ color: "#888" }}>Номер:</span> <b>{icon.number}</b>
+        </div>
+        <div>
+          <span style={{ color: "#888" }}>Шафа:</span> <b>{icon.shelf ?? icon.cabinet}</b>
+        </div>
+      </div>
+      {/* Примітка (note) */}
+      {icon.note && (
+        <div style={{ color: "#4b5c6b", fontSize: "0.96em", marginTop: 4 }}>{icon.note}</div>
+      )}
+      {isAdmin && (
+        <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+          <button className="btn btn-edit" onClick={onEdit}>Редагувати</button>
+          <button className="btn btn-delete" onClick={onDelete}>Видалити</button>
+        </div>
+      )}
+    </div>
+  );
+}

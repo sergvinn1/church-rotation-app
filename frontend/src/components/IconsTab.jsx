@@ -8,11 +8,16 @@ export default function IconsTab({ isAdmin }) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("name");
   const [editIcon, setEditIcon] = useState(null);
+  const [showAll, setShowAll] = useState(false);
 
   // Завантажити ікони при зміні пошуку/сортування
   useEffect(() => {
-    getIcons(search, sort).then(res => setIcons(res.data || []));
-  }, [search, sort]);
+    if (showAll || search.trim()) {
+      getIcons(search, sort).then(res => setIcons(res.data || []));
+    } else {
+      setIcons([]);
+    }
+  }, [search, sort, showAll]);
 
   // Зберегти (додавання/редагування) ікону
   const handleSave = async (data) => {
@@ -33,8 +38,17 @@ export default function IconsTab({ isAdmin }) {
     }
   };
 
-  // Скинути пошук
-  const handleClearSearch = () => setSearch("");
+  // Скинути пошук і показати всі ікони
+  const handleShowAll = () => {
+    setSearch("");
+    setShowAll(true);
+  };
+
+  // Якщо користувач щось шукає — автоматично показуємо результати
+  useEffect(() => {
+    if (search.trim()) setShowAll(true);
+    else setShowAll(false);
+  }, [search]);
 
   return (
     <div>
@@ -46,7 +60,13 @@ export default function IconsTab({ isAdmin }) {
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
-        <button className="btn btn-gray" onClick={handleClearSearch}>Усі ікони</button>
+        <button
+          className={`btn ${showAll ? "btn-blue" : "btn-gray"}`}
+          onClick={handleShowAll}
+          style={{ fontWeight: showAll ? 700 : 500 }}
+        >
+          Усі ікони
+        </button>
         <select
           value={sort}
           onChange={e => setSort(e.target.value)}
@@ -67,22 +87,24 @@ export default function IconsTab({ isAdmin }) {
           </button>
         )}
       </div>
-      <div className="icons-card-list" style={{ display: "flex", flexWrap: "wrap", gap: 18 }}>
-        {icons.length === 0 && (
-          <div style={{ color: "#888", fontStyle: "italic", margin: "32px auto" }}>
-            Немає ікон, що відповідають пошуку.
-          </div>
-        )}
-        {icons.map(icon => (
-          <IconCard
-            key={icon._id}
-            icon={icon}
-            isAdmin={isAdmin}
-            onEdit={() => setEditIcon(icon)}
-            onDelete={() => handleDelete(icon._id)}
-          />
-        ))}
-      </div>
+      {showAll && (
+        <div className="icons-card-list" style={{ display: "flex", flexWrap: "wrap", gap: 18 }}>
+          {icons.length === 0 && (
+            <div style={{ color: "#888", fontStyle: "italic", margin: "32px auto" }}>
+              Немає ікон, що відповідають пошуку.
+            </div>
+          )}
+          {icons.map(icon => (
+            <IconCard
+              key={icon._id}
+              icon={icon}
+              isAdmin={isAdmin}
+              onEdit={() => setEditIcon(icon)}
+              onDelete={() => handleDelete(icon._id)}
+            />
+          ))}
+        </div>
+      )}
       {isAdmin && (
         <IconEditDialog
           open={!!editIcon}
