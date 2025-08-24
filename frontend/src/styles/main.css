@@ -32,6 +32,8 @@ html, body {
   font-family: var(--font-main);
   background: var(--main-light);
   color: var(--tab-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 body, #root {
   min-height: 100vh;
@@ -42,6 +44,12 @@ body, #root {
 }
 #root {
   flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.app-content {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
 }
@@ -65,7 +73,6 @@ a:hover, .footer-link:hover {
   font-size: 2.6rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  border-radius: 0;
   position: relative;
   z-index: 2;
   user-select: none;
@@ -118,7 +125,6 @@ a:hover, .footer-link:hover {
   border-radius: var(--radius);
   cursor: pointer;
   transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-  outline: none;
   margin-bottom: 2px;
 }
 .tab-btn.active {
@@ -136,8 +142,6 @@ a:hover, .footer-link:hover {
   color: var(--btn-bg);
   background: #e3ecee88;
 }
-
-/* Вкладки всередині розкладу */
 .sub-tabs {
   display: flex;
   justify-content: left;
@@ -151,7 +155,6 @@ a:hover, .footer-link:hover {
   background: none;
   color: var(--main-blue);
   font-size: 1.08rem;
-  font-family: var(--font-main);
   font-weight: 600;
   padding: 7px 20px;
   border-radius: var(--radius);
@@ -174,9 +177,10 @@ a:hover, .footer-link:hover {
   padding: 40px 36px 28px 36px;
   margin-top: 28px;
   flex: 1 1 auto;
-  animation: fadeInUp 0.6s cubic-bezier(.5,1.5,.7,1.01);
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  animation: fadeInUp 0.6s cubic-bezier(.5,1.5,.7,1.01);
 }
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(18px);}
@@ -191,8 +195,6 @@ a:hover, .footer-link:hover {
   padding: 22px 12px 18px 12px;
   font-size: 1.07em;
   letter-spacing: 0.02em;
-  border-top-left-radius: var(--radius);
-  border-top-right-radius: var(--radius);
   box-shadow: 0 -3px 22px #34495e22;
   display: flex;
   flex-direction: column;
@@ -222,46 +224,17 @@ a:hover, .footer-link:hover {
   box-shadow: 0 2px 7px #1abc9c14;
   margin: 0 2px;
 }
-.btn-green {
-  background: var(--success);
-  color: #fff;
-}
-.btn-green:hover {
-  background: #04745a;
-}
-.btn-blue {
-  background: var(--info);
-  color: #fff;
-}
-.btn-blue:hover {
-  background: #0c6391;
-}
-.btn-red, .btn-danger {
-  background: var(--danger);
-  color: #fff;
-}
-.btn-red:hover, .btn-danger:hover {
-  background: #b03c1a;
-}
-.btn-gray {
-  background: #e1e4ea;
-  color: #333;
-  font-weight: 500;
-}
-.btn-edit {
-  background: var(--info);
-  color: #fff;
-}
-.btn-edit:hover {
-  background: #0c6391;
-}
-.btn-delete {
-  background: var(--danger);
-  color: #fff;
-}
-.btn-delete:hover {
-  background: #b03c1a;
-}
+.btn-green { background: var(--success); color: #fff; }
+.btn-green:hover { background: #04745a; }
+.btn-blue { background: var(--info); color: #fff; }
+.btn-blue:hover { background: #0c6391; }
+.btn-red, .btn-danger { background: var(--danger); color: #fff; }
+.btn-red:hover, .btn-danger:hover { background: #b03c1a; }
+.btn-gray { background: #e1e4ea; color: #333; font-weight: 500; }
+.btn-edit { background: var(--info); color: #fff; }
+.btn-edit:hover { background: #0c6391; }
+.btn-delete { background: var(--danger); color: #fff; }
+.btn-delete:hover { background: #b03c1a; }
 
 /* ====== INPUTS ====== */
 .church-input {
@@ -277,9 +250,7 @@ a:hover, .footer-link:hover {
   box-sizing: border-box;
   margin-bottom: 6px;
 }
-.church-input:focus {
-  border: 1.5px solid var(--main-blue);
-}
+.church-input:focus { border: 1.5px solid var(--main-blue); }
 
 /* ====== MODALS ====== */
 .church-modal-bg {
@@ -296,7 +267,6 @@ a:hover, .footer-link:hover {
   padding: 34px 30px;
   min-width: 340px;
   box-shadow: 0 8px 36px #10182055;
-  font-family: inherit;
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -358,7 +328,7 @@ a:hover, .footer-link:hover {
   transform: scale(1.025);
 }
 
-/* Список священників */
+/* Priests list */
 .priest-list-container {
   max-width: 560px;
   margin: 32px auto;
@@ -383,22 +353,10 @@ a:hover, .footer-link:hover {
   font-size: 1em;
   cursor: pointer;
 }
-.priest-card-info {
-  display: flex; flex-direction: column;
-}
-.priest-card-name {
-  font-size: 1.1em;
-  font-weight: 500;
-  color: #20334c;
-}
-.priest-card-rank {
-  font-size: 1em;
-  color: var(--success);
-}
-.priest-card-actions {
-  display: flex;
-  gap: 10px;
-}
+.priest-card-info { display: flex; flex-direction: column; }
+.priest-card-name { font-size: 1.1em; font-weight: 500; color: #20334c; }
+.priest-card-rank { font-size: 1em; color: var(--success); }
+.priest-card-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .priest-card-actions button {
   border: none;
   border-radius: 8px;
@@ -406,12 +364,8 @@ a:hover, .footer-link:hover {
   font-size: 0.98em;
   cursor: pointer;
 }
-.priest-card-actions .btn-edit {
-  background: var(--info); color: #fff;
-}
-.priest-card-actions .btn-delete {
-  background: var(--danger); color: #fff;
-}
+.priest-card-actions .btn-edit { background: var(--info); color: #fff; }
+.priest-card-actions .btn-delete { background: var(--danger); color: #fff; }
 
 .priest-schedule-header {
   font-size: 1.4em;
@@ -421,16 +375,14 @@ a:hover, .footer-link:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
 }
-
-/* Стилі для таблиці */
 .priest-schedule-table {
   width: 100%;
   border-collapse: collapse;
   background: var(--main-light);
   border-radius: 10px;
   box-shadow: 0 1px 8px #34495e17;
-  font-family: var(--font-main);
 }
 .priest-schedule-table th {
   background: var(--main-blue);
@@ -448,7 +400,7 @@ a:hover, .footer-link:hover {
   font-size: 16px;
 }
 
-/* Додаємо стилі для модалки та карток розкладу */
+/* Modals small */
 .modal-bg {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   background: #34495e88;
@@ -480,80 +432,49 @@ a:hover, .footer-link:hover {
 }
 
 /* Flex containers */
-.schedule-cards-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  margin-top: 14px;
-}
-.card-header {
-  font-size: 18px;
-  margin-bottom: 14px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-}
-.card-label {
-  font-weight: 500;
-  color: #23609b;
-  margin-right: 10px;
-}
-.card-value {
-  font-weight: 600;
-  color: #222;
-}
-.card-body > div {
-  margin-bottom: 10px;
-}
-.card-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 16px;
-}
+.schedule-cards-container { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 14px; }
+.card-header { font-size: 18px; margin-bottom: 14px; font-weight: 600; display: flex; align-items: center; }
+.card-label { font-weight: 500; color: #23609b; margin-right: 10px; }
+.card-value { font-weight: 600; color: #222; }
+.card-body > div { margin-bottom: 10px; }
+.card-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
 
-.deacon-filters {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 22px;
-}
-.deacon-dates-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-.deacon-action-btns {
-  display: flex;
-  gap: 14px;
-  margin-left: 16px;
-}
-.deacon-akathist-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 8px;
-}
+.deacon-filters { display: flex; flex-direction: column; gap: 16px; margin-bottom: 22px; }
+.deacon-dates-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.deacon-dates-row > * { min-width: 0; }
+.deacon-action-btns { display: flex; gap: 14px; margin-left: 16px; flex-wrap: wrap; }
+.deacon-akathist-row { display: flex; align-items: center; gap: 14px; margin-top: 8px; }
 
 /* ====== MEDIA QUERIES ====== */
 @media (max-width: 1200px) {
   .panel { max-width: 99vw; }
 }
 @media (max-width: 900px) {
-  .header { font-size: 1.38rem; padding: 18px 0 8px 0;}
-  .login-btn { top: 18px; right: 10px; padding: 8px 14px; font-size: 0.98rem;}
+  .header { font-size: 1.38rem; padding: 18px 0 8px 0; }
+  .login-btn { top: 18px; right: 10px; padding: 8px 14px; font-size: 0.98rem; }
   .tabs { gap: 10px; }
   .tab-btn { padding: 9px 12px; font-size: 0.97rem; }
-  .panel { padding: 18px 3px; }
-  .sub-tabs { gap: 7px; }
-  .sub-tab-btn { padding: 5px 9px; font-size: 0.95rem;}
-  .footer { font-size: 0.97em; padding: 11px 2px; }
+  .panel { padding: 18px 10px; }
+  .sub-tabs { gap: 10px; margin-top: 14px; }
+  .priest-schedule-header { flex-direction: column; align-items: flex-start; gap: 7px; }
 }
 @media (max-width: 600px) {
-  .panel { padding: 8px 0; }
-  .footer { font-size: 0.93em; padding: 7px 1px; margin-top: 0; }
-  .header { font-size: 1.04rem; }
-  .tabs { flex-wrap: wrap; gap: 4px;}
-  .tab-btn { padding: 7px 6px; font-size: 0.92rem; }
-  .login-btn { font-size: 0.92em; padding: 6px 10px; right: 3px; top: 8px;}
+  .header { font-size: 1.18rem; padding: 14px 0 6px 0; }
+  .login-btn {
+    position: static;
+    margin: 10px auto;
+    display: block;
+    padding: 7px 12px;
+    font-size: 0.9rem;
+  }
+  .tabs { flex-direction: column; align-items: center; gap: 6px; }
+  .tab-btn { width: 100%; max-width: 240px; text-align: center; }
+  .panel { padding: 12px 4px; margin-top: 10px; width: 100%; }
+  .sub-tabs { flex-direction: column; gap: 6px; }
+  .sub-tab-btn { width: 100%; max-width: 220px; text-align: center; }
+  .footer { font-size: 0.88em; padding: 14px 8px; }
+  .priest-schedule-header { font-size: 1.06em; }
+  .priest-list-container { padding: 12px; }
+  .modal-panel { width: 98vw; min-width: 0; padding: 10px 2vw; }
+  .church-modal { padding: 14px 2vw; min-width: 0; }
 }
