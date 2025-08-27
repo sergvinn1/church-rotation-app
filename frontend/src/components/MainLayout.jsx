@@ -13,7 +13,6 @@ import {
 } from '../api/rotationApi';
 import '../styles/main.css';
 
-
 const TABS = [
   { label: 'Розклад духовенства', value: 'schedule' },
   { label: 'Ікони', value: 'icons' },
@@ -25,6 +24,7 @@ const ADMIN_TABS = [
   { label: 'Диякони (реєстр)', value: 'deacons' }
 ];
 
+// Головний layout, який забезпечує "липкий" футер
 export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
   const [tab, setTab] = useState('schedule');
   const [showLogin, setShowLogin] = useState(false);
@@ -67,7 +67,6 @@ export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
   }, [scheduleRange]);
 
   // --- Додати/редагувати/видалити розклад ---
-  // ОНОВЛЕНА ФУНКЦІЯ: підтримує масове додавання!
   const handleAddOrEditSchedule = async (entryOrEntries) => {
     if (Array.isArray(entryOrEntries)) {
       for (const entry of entryOrEntries) {
@@ -101,8 +100,9 @@ export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
     return date.toISOString().slice(0, 10);
   }
 
+  // Структура для sticky footer: #root > .app-content + .footer
   return (
-    <div>
+    <div id="root">
       <div className="header" style={{position: 'relative'}}>
         Спасо-Преображенський кафедральний собор
         <button className="login-btn" onClick={() => setShowLogin(true)}>
@@ -123,56 +123,59 @@ export default function MainLayout({ token, setToken, isAdmin, setIsAdmin }) {
         ))}
       </div>
 
-      <div className="panel">
-        {tab === 'schedule' && (
-          <>
-            <div className="sub-tabs">
-              <button className={`sub-tab-btn ${scheduleTab === 'priest' ? 'active' : ''}`} onClick={() => setScheduleTab('priest')}>
-                Священники
-              </button>
-              <button className={`sub-tab-btn ${scheduleTab === 'deacon' ? 'active' : ''}`} onClick={() => setScheduleTab('deacon')}>
-                Диякони
-              </button>
-            </div>
-            {scheduleTab === 'priest' && (
-              <PriestScheduleTab
-                isAdmin={isAdmin}
-                token={token}
-                priests={priests}
-                schedule={schedule}
-                onSave={handleAddOrEditSchedule}
-                onDelete={handleDeleteSchedule}
-                dateRange={scheduleRange}
-                setDateRange={setScheduleRange}
-              />
-            )}
-            {scheduleTab === 'deacon' && <DeaconScheduleTab isAdmin={isAdmin} token={token} />}
-          </>
-        )}
-        {tab === 'icons' && <IconsTab isAdmin={isAdmin} />}
-        {tab === 'akathists' && <AkathistsTab isAdmin={isAdmin} />}
-        {tab === 'prayers' && <PrayerRitesTab isAdmin={isAdmin}/>}
-        {tab === 'priests' && isAdmin && (
-          <PriestListTab
-            isAdmin={isAdmin}
-            token={token}
-            priests={priests}
-            onSave={handleAddOrEditPriest}
-            onDelete={handleDeletePriest}
+      {/* Контент у flex-елементі для sticky footer */}
+      <div className="app-content">
+        <div className="panel">
+          {tab === 'schedule' && (
+            <>
+              <div className="sub-tabs">
+                <button className={`sub-tab-btn ${scheduleTab === 'priest' ? 'active' : ''}`} onClick={() => setScheduleTab('priest')}>
+                  Священники
+                </button>
+                <button className={`sub-tab-btn ${scheduleTab === 'deacon' ? 'active' : ''}`} onClick={() => setScheduleTab('deacon')}>
+                  Диякони
+                </button>
+              </div>
+              {scheduleTab === 'priest' && (
+                <PriestScheduleTab
+                  isAdmin={isAdmin}
+                  token={token}
+                  priests={priests}
+                  schedule={schedule}
+                  onSave={handleAddOrEditSchedule}
+                  onDelete={handleDeleteSchedule}
+                  dateRange={scheduleRange}
+                  setDateRange={setScheduleRange}
+                />
+              )}
+              {scheduleTab === 'deacon' && <DeaconScheduleTab isAdmin={isAdmin} token={token} />}
+            </>
+          )}
+          {tab === 'icons' && <IconsTab isAdmin={isAdmin} />}
+          {tab === 'akathists' && <AkathistsTab isAdmin={isAdmin} />}
+          {tab === 'prayers' && <PrayerRitesTab isAdmin={isAdmin}/>}
+          {tab === 'priests' && isAdmin && (
+            <PriestListTab
+              isAdmin={isAdmin}
+              token={token}
+              priests={priests}
+              onSave={handleAddOrEditPriest}
+              onDelete={handleDeletePriest}
+            />
+          )}
+          {tab === 'deacons' && isAdmin && <DeaconListTab isAdmin={isAdmin} token={token} />}
+        </div>
+        {showLogin && (
+          <LoginDialog
+            open={showLogin}
+            onClose={() => setShowLogin(false)}
+            setToken={setToken}
+            setIsAdmin={setIsAdmin}
           />
         )}
-        {tab === 'deacons' && isAdmin && <DeaconListTab isAdmin={isAdmin} token={token} />}
       </div>
 
-      {showLogin && (
-        <LoginDialog
-          open={showLogin}
-          onClose={() => setShowLogin(false)}
-          setToken={setToken}
-          setIsAdmin={setIsAdmin}
-        />
-      )}
-
+      {/* Футер на одному рівні вкладеності з .app-content */}
       <div className="footer">
         © 2025 Спасо-Преображенський кафедральний собор. Всі права захищені.
       </div>
