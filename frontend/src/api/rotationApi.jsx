@@ -1,5 +1,5 @@
 import axios from "axios";
-/*const VITE_API_URL = "http://localhost:4000/api";*/
+
 const VITE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
 // === CRUD для списку дияконів ===
@@ -64,15 +64,16 @@ export const deletePriestSchedule = (id, token) =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
+// === CRUD для акафістів дияконів ===
 export const getDeaconAkathists = (date) =>
-  axios.get("/api/deacon-akathists", { params: { date } });
+  axios.get(`${VITE_API_URL}/deacon-akathists`, { params: { date } });
 
 export const addDeaconAkathist = (data, token) =>
-  axios.post("/api/deacon-akathists", data, {
+  axios.post(`${VITE_API_URL}/deacon-akathists`, data, {
     headers: { Authorization: `Bearer ${token}` }
   });
 
 export const deleteDeaconAkathist = (id, token) =>
-  axios.delete(`/api/deacon-akathists/${id}`, {
+  axios.delete(`${VITE_API_URL}/deacon-akathists/${id}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
