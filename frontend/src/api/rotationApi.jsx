@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const VITE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+const VITE_API_URL = import.meta.env.VITE_API_URL /*|| "http://localhost:4000/api"*/;
 
 // === CRUD для списку дияконів ===
 export const getDeacons = () => axios.get(`${VITE_API_URL}/deacons`);
@@ -23,6 +23,7 @@ export const addPriest = (data, token) =>
   axios.post(`${VITE_API_URL}/priests`, data, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
 export const updatePriest = (id, data, token) =>
   axios.put(`${VITE_API_URL}/priests/${id}`, data, {
     headers: { Authorization: `Bearer ${token}` },
