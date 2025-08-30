@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const VITE_API_URL = import.meta.env.VITE_API_URL /*|| "http://localhost:4000/api"*/;
+const VITE_API_URL = import.meta.env.VITE_API_URL; 
 
 // === CRUD для списку дияконів ===
 export const getDeacons = () => axios.get(`${VITE_API_URL}/deacons`);
